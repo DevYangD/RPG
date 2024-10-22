@@ -16,6 +16,8 @@ TagManager:
   - Sword
   - Boss_Field
   - BulletPos
+  - FxTemporaire
+  - First
   layers:
   - Default
   - TransparentFX

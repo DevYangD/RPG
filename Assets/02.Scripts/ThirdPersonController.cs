@@ -324,6 +324,7 @@ namespace StarterAssets
         {
             isFall = false;
             isFallDirection = false;
+            EndRoll();
         }
 
 
