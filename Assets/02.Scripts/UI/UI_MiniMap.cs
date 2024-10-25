@@ -15,7 +15,7 @@ public class UI_MiniMap : MonoBehaviour
     [SerializeField]
     private float           zoomOnestep = 1;
     [SerializeField]
-    private TextMeshProUGUI textMapName;
+    public TextMeshProUGUI textMapName;
     MiniMapController minimapctrl;
 
     private void Awake()

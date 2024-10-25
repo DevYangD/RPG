@@ -2,58 +2,80 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MiniMapEntity{
-	public bool showDetails = false;
-	public Sprite icon;
-	public bool rotateWithObject = true;
-	public Vector3 upAxis;
-	public float rotation;
-	public Vector2 size;
-	public bool clampInBorder;
-	public float clampDist;
-	public List<GameObject> mapObjects;
+public class MiniMapEntity
+{
+    public bool showDetails = false;
+    public Sprite icon;
+    public bool rotateWithObject = true;
+    public Vector3 upAxis;
+    public float rotation;
+    public Vector2 size;
+    public bool clampInBorder;
+    public float clampDist;
+    public List<GameObject> mapObjects;
 }
 
-public class MiniMapComponent : MonoBehaviour {
-	[Tooltip("Set the icon of this gameobject")]
-	public Sprite icon;
-	[Tooltip("Set size of the icon")]
-	public Vector2 size = new Vector2(20,20);
-	[Tooltip("Set true if the icon rotates with the gameobject")]
-	public bool rotateWithObject = false;
-	[Tooltip("Adjust the rotation axis according to your gameobject. Values of each axis can be either -1,0 or 1")]
-	public Vector3 upAxis = new Vector3(0,1,0);
-	[Tooltip("Adjust initial rotation of the icon")]
-	public float initialIconRotation;
-	[Tooltip("If true the icons will be clamped in the border")]
-	public bool clampIconInBorder = true;
-	[Tooltip("Set the distance from target after which the icon will not be shown. Setting it 0 will always show the icon.")]
-	public float clampDistance = 100;
+public class MiniMapComponent : MonoBehaviour
+{
+    [Tooltip("Set the icon of this gameobject")]
+    public Sprite icon;
+    [Tooltip("Set size of the icon")]
+    public Vector2 size = new Vector2(20, 20);
+    [Tooltip("Set true if the icon rotates with the gameobject")]
+    public bool rotateWithObject = false;
+    [Tooltip("Adjust the rotation axis according to your gameobject. Values of each axis can be either -1,0 or 1")]
+    public Vector3 upAxis = new Vector3(0, 1, 0);
+    [Tooltip("Adjust initial rotation of the icon")]
+    public float initialIconRotation;
+    [Tooltip("If true the icons will be clamped in the border")]
+    public bool clampIconInBorder = true;
+    [Tooltip("Set the distance from target after which the icon will not be shown. Setting it 0 will always show the icon.")]
+    public float clampDistance = 100;
 
-	MiniMapController miniMapController;
-	MiniMapEntity mme;
-	MapObject mmo;
+    MiniMapController miniMapController;
+    MiniMapEntity mme;
+    MapObject mmo;
 
-	void OnEnable(){
-		miniMapController = GameObject.Find ("CanvasMiniMap").GetComponent<MiniMapController> ();
-		mme = new MiniMapEntity ();
-		mme.icon = icon;
-		mme.rotation = initialIconRotation;
-		mme.size = size;
-		mme.upAxis = upAxis;
-		mme.rotateWithObject = rotateWithObject;
-		mme.clampInBorder = clampIconInBorder;
-		mme.clampDist = clampDistance;
+    void OnEnable()
+    {
+        // MiniMapController가 존재하는지 체크
+        GameObject canvasMiniMap = GameObject.Find("CanvasMiniMap");
+        if (canvasMiniMap != null)
+        {
+            miniMapController = canvasMiniMap.GetComponent<MiniMapController>();
+        }
 
-		mmo = miniMapController.RegisterMapObject(this.gameObject, mme);
-	}
+        // miniMapController가 null이 아닌지 확인
+        if (miniMapController != null)
+        {
+            mme = new MiniMapEntity();
+            mme.icon = icon;
+            mme.rotation = initialIconRotation;
+            mme.size = size;
+            mme.upAxis = upAxis;
+            mme.rotateWithObject = rotateWithObject;
+            mme.clampInBorder = clampIconInBorder;
+            mme.clampDist = clampDistance;
 
-	void OnDisable(){
-		miniMapController.UnregisterMapObject (mmo,this.gameObject);
-	}
+            mmo = miniMapController.RegisterMapObject(this.gameObject, mme);
+        }
+    }
 
-	void OnDestroy(){
-		miniMapController.UnregisterMapObject (mmo,this.gameObject);
-	}
+    void OnDisable()
+    {
+        // miniMapController와 mmo가 null이 아닌지 체크
+        if (miniMapController != null && mmo != null)
+        {
+            miniMapController.UnregisterMapObject(mmo, this.gameObject);
+        }
+    }
 
+    void OnDestroy()
+    {
+        // miniMapController와 mmo가 null이 아닌지 체크
+        if (miniMapController != null && mmo != null)
+        {
+            miniMapController.UnregisterMapObject(mmo, this.gameObject);
+        }
+    }
 }

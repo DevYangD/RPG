@@ -4,68 +4,88 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using DG.Tweening; // DOTween 네임스페이스 추가
+
 public class UIMgr : MonoBehaviour
 {
-    public bool isPopup = false;
-    public GameObject gameobject;
-    public GameObject bossHpSilder;
-    public ThirdPersonController playctrl;
-    public GameObject text;
-    // Start is called before the first frame update
+    public GameObject gameobject; // 팝업 게임 오브젝트
+    public GameObject bossHpSlider; // 보스 HP 슬라이더
+    public ThirdPersonController playerController; // 플레이어 컨트롤러
+    public GameObject text; // 기타 UI 텍스트
+    public GameObject text2;
+    private bool isPopup = false; // 팝업 상태
+
     void Start()
     {
-
+        playerController = FindObjectOfType<ThirdPersonController>();
+        playerController.isPopup = false;
         gameobject.SetActive(false);
-        playctrl = FindObjectOfType<ThirdPersonController>();
-        playctrl.isPopup = false;
-        bossHpSilder.SetActive(false);
+        bossHpSlider.SetActive(false);
     }
 
-    // Update is called once per frame
     void Update()
     {
+        // R 키 입력 시 팝업 토글
         if (Input.GetKeyDown(KeyCode.R))
         {
-            POPUP();
-            Show();
+            TogglePopup();
+            HideText();
         }
-        
     }
 
-    public void POPUP()
+    public void TogglePopup()
     {
-        isPopup =!isPopup;
-        playctrl.isPopup =!playctrl.isPopup;
-        gameobject.SetActive(isPopup);
+        isPopup = !isPopup; // 팝업 상태 토글
+        playerController.isPopup = isPopup; // 플레이어의 팝업 상태도 동기화
+
+        if (isPopup)
+        {
+            ShowPopup();
+        }
+        else
+        {
+            HidePopup();
+        }
     }
 
-
-
-    public void OnClickStat()
+    private void ShowPopup()
     {
-        isPopup = !isPopup;
-        playctrl.isPopup = !playctrl.isPopup;
+        gameobject.SetActive(true);
+        gameobject.transform.localScale = Vector3.one * 0.1f; // 초기 스케일 설정
+
+        // DOTween을 사용하여 애니메이션 효과 추가
+        gameobject.transform.DOScale(1.1f, 0.2f).OnComplete(() =>
+        {
+            gameobject.transform.DOScale(1f, 0.1f);
+        });
     }
 
-    public void OnClickInventory()
+    private void HidePopup()
     {
-        isPopup = !isPopup;
-        playctrl.isPopup = !playctrl.isPopup;
-    }
-
-    public void OnOption()
-    {
-        isPopup = !isPopup;
-        playctrl.isPopup = !playctrl.isPopup;
+        // DOTween을 사용하여 애니메이션 효과 추가
+        gameobject.transform.DOScale(1.1f, 0.1f).OnComplete(() =>
+        {
+            gameobject.transform.DOScale(0.1f, 0.2f).OnComplete(() =>
+            {
+                gameobject.SetActive(false); // 애니메이션이 끝난 후 비활성화
+            });
+        });
     }
 
     public void BossTag()
     {
-        bossHpSilder.SetActive(true);
+        bossHpSlider.SetActive(true);
+        text2.SetActive(true);
     }
 
-    public void Show()
+    public void ShowText()
     {
-        text.SetActive(false);
+        text.SetActive(true); // 텍스트를 보여주기 위한 메서드
+    }
+
+    public void HideText()
+    {
+        text.SetActive(false); // 텍스트를 숨기기 위한 메서드
+
     }
 }

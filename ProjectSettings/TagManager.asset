@@ -18,6 +18,8 @@ TagManager:
   - BulletPos
   - FxTemporaire
   - First
+  - Damping
+  - Boss
   layers:
   - Default
   - TransparentFX

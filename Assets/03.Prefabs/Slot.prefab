@@ -341,3 +341,6 @@ MonoBehaviour:
   itemImg: {fileID: 564419310455310722}
   text_Count: {fileID: 5425057692016606497}
   go_CountImg: {fileID: 1598868756252714408}
+  hpSound: HP
+  EndDragSound: DROP
+  beginDragSound: 

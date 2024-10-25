@@ -21,6 +21,9 @@ public class Boss : MonoBehaviour
     public Transform target;
     public Slider bossHpSlider;
     public GameObject bloodE;
+    public GameObject hitE;
+    public GameObject clear;
+    public float DeadT = 2f;
 
     [SerializeField]
     private string Fireball;
@@ -71,6 +74,20 @@ public class Boss : MonoBehaviour
         if(isDead)
         {
             StopAllCoroutines();
+
+            DeadT -=Time.deltaTime;
+            if(DeadT <=0)
+            {
+
+                if(Input.anyKey)
+                {
+#if UNITY_EDITOR
+                    UnityEditor.EditorApplication.isPlaying = false; // 에디터에서 플레이 모드 종료
+#else
+                Application.Quit(); // 빌드된 게임에서 종료
+#endif
+                }
+            }
             return;
         }
         if (isLook)
@@ -81,6 +98,7 @@ public class Boss : MonoBehaviour
             transform.LookAt(target.position + lookVec);
             
         }
+
     }
 
     IEnumerator Think()
@@ -185,8 +203,13 @@ public class Boss : MonoBehaviour
         {
             if(!isHit)
             {
+                Vector3 pos = Camera.main.WorldToScreenPoint(transform.position);
+                Damage_Ctrl.Instance.CreateDamageText(pos, PlayerCtrl.Instance.AtkValue);
                 GameObject inIt = Instantiate(bloodE, other.transform.position, other.transform.rotation );
+                GameObject inIt2 = Instantiate(hitE, other.transform.position, other.transform.rotation );
                 Destroy( inIt ,1f);
+                Destroy( inIt2 ,1f);
+
                 StartCoroutine(OnHit()); 
             }
         }
@@ -212,8 +235,7 @@ public class Boss : MonoBehaviour
         else if (!isDead && curHp <= 0)
         {
             CheckBossHp();
-            isDead = true;
-            Die();
+            StartCoroutine(Die());
         }
 
     }
@@ -223,19 +245,26 @@ public class Boss : MonoBehaviour
         yield return new WaitWhile(() => isGo == false);
         StartCoroutine(Think());
     }
-    public void Die()
+    public IEnumerator Die()
     {
         SoundMgr.instance.PlaySE(died);
         fireSkill.SetActive(false);
         anim.SetTrigger("doDie");
+        Time.timeScale = 0.2f;
+        yield return new WaitForSeconds(1f);
         isDead = true;
+        Debug.Log("DIE!!");
+        Time.timeScale = 1f;
+        clear.SetActive(true);
+        
+
     }
 
     public void CheckBossHp()
     {
         if (bossHpSlider != null)
         {
-            bossHpSlider.value = curHp / MaxHp;
+            bossHpSlider.value = curHp;
         }
     }
 }

@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-
+using Cinemachine;
 public class PlayerCtrl : MonoBehaviour
 {
     private float hpValue;
@@ -11,7 +11,7 @@ public class PlayerCtrl : MonoBehaviour
     private int atkValue;
     private int defValue;
     private float spdValue;
-    private float spValue;
+    public float spValue;
 
     private int skillPoint;
 
@@ -21,7 +21,13 @@ public class PlayerCtrl : MonoBehaviour
     public Slider hpSlider;
     public Slider spSlider;
     public GameObject boss;
-    
+    public GameObject melee_Hitted;
+    public GameObject Fireball_Hit;
+    public GameObject ShieldEffect;
+    public GameObject fireSkillEffect;
+    public GameObject bossClear;
+    public GameObject finishE;
+    public Transform finishEffectPos;
 
     private Vector3 knockbackVelocity;
     private bool isKnockback;
@@ -54,8 +60,16 @@ public class PlayerCtrl : MonoBehaviour
     public bool isDamage;
     SkinnedMeshRenderer mesh;
     public CharacterController characterController;
+    private CinemachineVirtualCamera _cam;
+
+    public float defaultFOV = 40f;
+    public float zoomFOV = 30f;
+    public float zoomSpeed = 5f;
+
+    private Coroutine zoomCoroutine;
 
     ThirdPersonController plctrl;
+    CameraShake cameraShake;
     public float HpValue { get => hpValue; set => hpValue = value; }
     public float CurHpValue { get => curhpValue; set => curhpValue = value; }
     public int AtkValue { get => atkValue; set => atkValue = value; }
@@ -70,6 +84,7 @@ public class PlayerCtrl : MonoBehaviour
     {
         get
         {
+           
             if (instance == null)
             {
                 instance = FindObjectOfType<PlayerCtrl>();
@@ -117,6 +132,8 @@ public class PlayerCtrl : MonoBehaviour
         mesh = GetComponentInChildren<SkinnedMeshRenderer>();
         characterController = GetComponent<CharacterController>();
         plctrl = GetComponent<ThirdPersonController>();
+        cameraShake = FindObjectOfType<CameraShake>();
+        _cam = FindObjectOfType<CinemachineVirtualCamera>();
 
         instance.hpValue = 200;
         instance.curhpValue = 200;
@@ -188,7 +205,7 @@ public class PlayerCtrl : MonoBehaviour
     {
         if (spSlider != null)
         {
-            spSlider.value = PlayerCtrl.Instance.SpValue / 5;
+            spSlider.value = SpValue / 5;
         }
 
         if(SpdValue <=0)
@@ -203,32 +220,47 @@ public class PlayerCtrl : MonoBehaviour
     }
     void OnTriggerEnter(Collider other)
     {
-        if (plctrl.isShield) return;
+        
         if(other.tag == "EnemyBullet")
         {
-            if(!isDamage)
+            if(plctrl.isShield)
             {
+                StartCoroutine(HitDamage());
+                GameObject shieldEffect = Instantiate(ShieldEffect, other.transform.position, other.transform.rotation);
+                Destroy(shieldEffect, 1f);
+            }
+            
+            if(!isDamage &&!plctrl.isShield)
+            {
+                GameObject fireball_HitEffect = Instantiate(Fireball_Hit, other.transform.position, other.transform.rotation);
+                Destroy(fireball_HitEffect, 0.5f);
                 FireBall enemybullet = other.GetComponent<FireBall>();
                 curhpValue = curhpValue - enemybullet.damage + defValue;
                 CheckHp();
                 StartCoroutine(OnDamage());
+                StartCoroutine(HitDamage());
+                
             }
         }
         if (other.tag == "Breath")
         {
             if (!isDamage)
             {
-                curhpValue = curhpValue - 25 + defValue;
-                CheckHp();
-                StartCoroutine(OnDamage());
+                StartCoroutine(FireSkillHit());
+                StartCoroutine(HitDamage());
+
             }
         }
         if (other.tag == "Boss_MeleeAtk")
         {
             if(!isDamage)
             {
+
+                GameObject MeleeHit = Instantiate(melee_Hitted, transform.position, transform.rotation);
+                Destroy(MeleeHit, 1f);
                 ThirdPersonController ctrl = GetComponent<ThirdPersonController>();
                 ctrl.Fall();
+                
                 curhpValue = curhpValue -30 + defValue;
                 CheckHp();
                 if (boss != null)
@@ -241,12 +273,16 @@ public class PlayerCtrl : MonoBehaviour
                 isKnockback = true;
                 knockbackTimer = knockbackDuration;
                 StartCoroutine(OnDamage());
+                cameraShake.MeleeDoShake();
             }
         }
         if (other.tag == "Boss_Field")
         {
             UIMgr ulmgr = FindObjectOfType<UIMgr>();
             Boss boss = FindObjectOfType<Boss>();
+            UI_MiniMap minimap = FindObjectOfType<UI_MiniMap>();
+            StartCoroutine(BossPopUp());
+            minimap.textMapName.text = "BOSS_DRAGON";
             ulmgr.BossTag();
             boss.isGo = true;
             SoundMgr.instance.StopBGM(BGM);
@@ -255,11 +291,27 @@ public class PlayerCtrl : MonoBehaviour
         }
         if (other.tag == "First")
         {
+            UI_MiniMap minimap = FindObjectOfType<UI_MiniMap>();
+            minimap.textMapName.text = "STARTING";
             SoundMgr.instance.PlayBGM(BGM);
             Debug.Log("닿았다");
             Destroy(other.gameObject);
         }
+        if(other.tag == "Damping")
+        {
+            
+            StartCoroutine(StartDamp());
+            
+        }
 
+    }
+
+    IEnumerator StartDamp()
+    {
+        
+        cameraShake.StartDamping();
+        yield return new WaitForSeconds(1f);
+        cameraShake.EndDamping();
     }
 
     IEnumerator OnDamage()
@@ -271,6 +323,14 @@ public class PlayerCtrl : MonoBehaviour
 
         isDamage = false;
         mesh.material.color = Color.white;
+        
+    }
+
+    IEnumerator HitDamage()
+    {
+        cameraShake.HitShake();
+        yield return new WaitForSeconds(0.5f);
+        cameraShake.StopShake();
     }
 
     public void SwordSound1()
@@ -300,6 +360,85 @@ public class PlayerCtrl : MonoBehaviour
     public void Rollsound()
     {
         SoundMgr.instance.PlaySE(rollsound);
+    }
+
+    public void meleeAtkShake()
+    {
+        cameraShake.DoShake();
+    }
+
+    public void meleeFinish()
+    {
+        cameraShake.FinishShake();
+        GameObject finisheffect = Instantiate(finishE, finishEffectPos.position, finishEffectPos.rotation);
+        Destroy(finisheffect, 1f);
+    }
+    public void DoStopShake()
+    {
+        cameraShake.StopShake();
+    }
+
+    public void FinishZoomStart()
+    {
+        // 기존 줌 코루틴이 있으면 중지
+        if (zoomCoroutine != null)
+        {
+            StopCoroutine(zoomCoroutine);
+        }
+
+        // 줌 인 코루틴 시작
+        zoomCoroutine = StartCoroutine(SmoothZoom(zoomFOV));
+    }
+
+    public void FinishZoomEnd()
+    {
+        // 기존 줌 코루틴이 있으면 중지
+        if (zoomCoroutine != null)
+        {
+            StopCoroutine(zoomCoroutine);
+        }
+
+        // 줌 아웃 코루틴 시작
+        zoomCoroutine = StartCoroutine(SmoothZoom(defaultFOV));
+    }
+
+    public IEnumerator SmoothZoom(float targetFOV)
+    {
+        float startFOV = _cam.m_Lens.FieldOfView;
+
+        float elapT = 0f;
+        while(elapT <1f)
+        {
+            _cam.m_Lens.FieldOfView = Mathf.Lerp(startFOV, targetFOV, elapT);
+            elapT += Time.deltaTime * zoomSpeed;
+            yield return null;
+        }
+        _cam.m_Lens.FieldOfView = targetFOV;
+    }
+
+    IEnumerator FireSkillHit()
+    {
+        SoundMgr.instance.PlaySE(hitted);
+        isDamage = true;
+        fireSkillEffect.SetActive(true);
+        curhpValue = curhpValue - 10 + defValue;
+        CheckHp();
+        yield return new WaitForSeconds(0.2f);
+        curhpValue = curhpValue - 10 + defValue;
+        CheckHp();
+        yield return new WaitForSeconds(0.2f);
+        curhpValue = curhpValue - 10 + defValue;
+        CheckHp();
+        yield return new WaitForSeconds(0.6f);
+        isDamage = false;
+        fireSkillEffect.SetActive(false);
+    }
+
+    IEnumerator BossPopUp()
+    {
+        bossClear.SetActive(true);
+        yield return new WaitForSeconds(2f);
+        bossClear.SetActive(false);
     }
 
 
