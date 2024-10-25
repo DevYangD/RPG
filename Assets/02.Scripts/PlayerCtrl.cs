@@ -248,6 +248,7 @@ public class PlayerCtrl : MonoBehaviour
             {
                 StartCoroutine(FireSkillHit());
                 StartCoroutine(HitDamage());
+                StartCoroutine(VolumeCtrl());
 
             }
         }
@@ -260,7 +261,7 @@ public class PlayerCtrl : MonoBehaviour
                 Destroy(MeleeHit, 1f);
                 ThirdPersonController ctrl = GetComponent<ThirdPersonController>();
                 ctrl.Fall();
-                
+
                 curhpValue = curhpValue -30 + defValue;
                 CheckHp();
                 if (boss != null)
@@ -273,6 +274,7 @@ public class PlayerCtrl : MonoBehaviour
                 isKnockback = true;
                 knockbackTimer = knockbackDuration;
                 StartCoroutine(OnDamage());
+                StartCoroutine(VolumeCtrl());
                 cameraShake.MeleeDoShake();
             }
         }
@@ -331,6 +333,14 @@ public class PlayerCtrl : MonoBehaviour
         cameraShake.HitShake();
         yield return new WaitForSeconds(0.5f);
         cameraShake.StopShake();
+    }
+
+    IEnumerator VolumeCtrl()
+    {
+        VolumeCtrl volumeCtrl = FindObjectOfType<VolumeCtrl>();
+        volumeCtrl.SetVignetteIntensity();
+        yield return new WaitForSeconds(0.5f);
+        volumeCtrl.GetVignetteIntensity();
     }
 
     public void SwordSound1()
