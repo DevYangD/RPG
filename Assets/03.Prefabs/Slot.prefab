@@ -339,8 +339,10 @@ MonoBehaviour:
   item: {fileID: 0}
   itemCount: 0
   itemImg: {fileID: 564419310455310722}
+  swordE: {fileID: 2927932897685411596, guid: 9b23f0152b9b93548a69527e3fda0129, type: 3}
   text_Count: {fileID: 5425057692016606497}
   go_CountImg: {fileID: 1598868756252714408}
   hpSound: HP
+  getSwordSound: GetSword
   EndDragSound: DROP
-  beginDragSound: 
+  beginDragSound: DROP

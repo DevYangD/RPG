@@ -3,27 +3,32 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-public class Slot_UI : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, IEndDragHandler, IDropHandler, IDragHandler
+public class Slot_UI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler, IBeginDragHandler, IEndDragHandler, IDropHandler, IDragHandler
 {
     public Item item;
     public int itemCount;
     public Image itemImg;
 
+    
     [SerializeField]
     private Text text_Count;
     [SerializeField]
     private GameObject go_CountImg;
+
     [SerializeField]
     private string hpSound;
+    [SerializeField]
+    private string getSwordSound;
     [SerializeField]
     private string EndDragSound;
     [SerializeField]
     private string beginDragSound;
 
+    private Slot_Tooltip theSlot;
 
     void Start()
     {
-        
+        theSlot = FindObjectOfType<Slot_Tooltip>();
     }
     private void SetColor(float _alpha)
     {
@@ -83,6 +88,8 @@ public class Slot_UI : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, I
                 if(item.itemtype == Item.ItemType.Equipment)
                 {
                     //ÀåÂø
+                    
+                    SoundMgr.instance.PlaySE(getSwordSound);
                 }
                 else
                 {
@@ -145,4 +152,26 @@ public class Slot_UI : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, I
         else
             DragSlot_UI.instance.dragSlot.ClearSlot();
     }
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        ShowToolTip(item, transform.position);
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        HideToolTip();
+    }
+
+    public void ShowToolTip(Item _item, Vector3 _pos)
+    {
+        if(item != null)
+        theSlot.ShowToolTip(_item, _pos);
+    }
+
+    public void HideToolTip()
+    {
+        theSlot.HideToolTip();
+    }
+
 }

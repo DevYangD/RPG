@@ -13,6 +13,8 @@ public class Item : ScriptableObject
         ETC
     }
     public string itemName;
+    [TextArea]
+    public string itemDesc;
     public ItemType itemtype;
     public Sprite itemimg;
     public GameObject itemPrefab;

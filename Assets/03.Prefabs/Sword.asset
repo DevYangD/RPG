@@ -13,6 +13,8 @@ MonoBehaviour:
   m_Name: Sword
   m_EditorClassIdentifier: 
   itemName: "\uAC80"
+  itemDesc: "\uBD80\uB7EC\uC9C0\uAE30 \uC9C1\uC804\uC758\n\uAC00\uC7A5 \uAE30\uBCF8\uC801\uC778
+    \uAC80\uC774\uB2E4.\n"
   itemtype: 0
   itemimg: {fileID: 21300000, guid: 5fd50594014b70e48bd6993443d46b32, type: 3}
   itemPrefab: {fileID: 3422148749903356128, guid: 098658dd76a686646acdc3426194ffbf, type: 3}

@@ -222,13 +222,13 @@ public class Boss : MonoBehaviour
         {
             isHit = true;
             curHp -= PlayerCtrl.Instance.AtkValue;
-            mesh.material.color = Color.black;
+            mesh.material.SetColor("_BaseColor", Color.gray);
             SoundMgr.instance.PlaySE(mhit);
             CheckBossHp();
             Time.timeScale = 0.7f;
             yield return new WaitForSeconds(0.5f);
             isHit = false;
-            mesh.material.color = Color.white;
+            mesh.material.SetColor("_BaseColor", Color.white);
             Time.timeScale = 1.0f;
         }
 
