@@ -446,8 +446,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -279, y: -256}
-  m_SizeDelta: {x: 346.0922, y: 75.2314}
+  m_AnchoredPosition: {x: -127.06073, y: -256}
+  m_SizeDelta: {x: 649.9708, y: 75.2314}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &760500388
 MonoBehaviour:
@@ -469,7 +469,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'TIPS : ABCD'
+  m_text: "TIPS : DRAGON\uC744 \uC7A1\uC544\uB77C!!!!"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 1c094b811711ffc48a03c0908842b164, type: 2}
   m_sharedMaterial: {fileID: 7397234774406051624, guid: 1c094b811711ffc48a03c0908842b164, type: 2}
@@ -502,7 +502,7 @@ MonoBehaviour:
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 1
+  m_fontStyle: 0
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 256
   m_textAlignment: 65535
