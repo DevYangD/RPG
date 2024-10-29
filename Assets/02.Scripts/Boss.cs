@@ -74,7 +74,7 @@ public class Boss : MonoBehaviour
         if(isDead)
         {
             StopAllCoroutines();
-
+            anim.SetTrigger("doDie");
             DeadT -=Time.deltaTime;
             if(DeadT <=0)
             {

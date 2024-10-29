@@ -259,9 +259,8 @@ public class PlayerCtrl : MonoBehaviour
 
                 GameObject MeleeHit = Instantiate(melee_Hitted, transform.position, transform.rotation);
                 Destroy(MeleeHit, 1f);
-                ThirdPersonController ctrl = GetComponent<ThirdPersonController>();
-                ctrl.Fall();
 
+                StartCoroutine(BossMeelAtk());
                 curhpValue = curhpValue -30 + defValue;
                 CheckHp();
                 if (boss != null)
@@ -308,6 +307,14 @@ public class PlayerCtrl : MonoBehaviour
 
     }
 
+    IEnumerator BossMeelAtk()
+    {
+        ThirdPersonController ctrl = GetComponent<ThirdPersonController>();
+        ctrl.Fall();
+        yield return new WaitForSeconds(1f);
+        ctrl.EndFall();
+        ctrl.endAttack();
+    }
     IEnumerator StartDamp()
     {
         

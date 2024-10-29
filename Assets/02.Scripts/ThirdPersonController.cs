@@ -279,7 +279,7 @@ namespace StarterAssets
 
             }
         }
-        private void endAttack()
+        public void endAttack()
         {
             isAttack = false;
             _input.attack = false;
@@ -324,6 +324,7 @@ namespace StarterAssets
         {
             isFall = false;
             isFallDirection = false;
+            
             EndRoll();
             EndDirection();
         }
