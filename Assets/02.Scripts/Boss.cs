@@ -73,8 +73,9 @@ public class Boss : MonoBehaviour
         
         if(isDead)
         {
+            
             StopAllCoroutines();
-            anim.SetTrigger("doDie");
+            
             DeadT -=Time.deltaTime;
             if(DeadT <=0)
             {
@@ -249,10 +250,11 @@ public class Boss : MonoBehaviour
     {
         SoundMgr.instance.PlaySE(died);
         fireSkill.SetActive(false);
-        anim.SetTrigger("doDie");
+        
         Time.timeScale = 0.2f;
         yield return new WaitForSeconds(1f);
         isDead = true;
+        anim.SetTrigger("doDie");
         Debug.Log("DIE!!");
         Time.timeScale = 1f;
         clear.SetActive(true);
